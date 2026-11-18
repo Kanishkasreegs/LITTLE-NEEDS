@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LittleNeeds</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f8f2;
+ color:#263b32;
+}
+header{
+ background:#245c48;
+ color:white;
+ padding:25px;
+ text-align:center;
+}
+header h1{margin:0;font-size:35px}
+header p{margin:8px 0 0}
+nav{
+ background:#dcebdd;
+ padding:13px;
+ text-align:center;
+}
+nav a{
+ text-decoration:none;
+ color:#245c48;
+ margin:0 15px;
+ font-weight:bold;
+}
+section{padding:30px 7%}
+h2{text-align:center;color:#245c48}
+.hero{
+ background:#e5f1e3;
+ text-align:center;
+ padding:45px 20px;
+ border-radius:15px;
+}
+.hero h2{font-size:30px}
+.hero p{max-width:650px;margin:auto;line-height:1.7}
+button{
+ background:#347858;
+ color:white;
+ border:none;
+ padding:11px 18px;
+ border-radius:7px;
+ cursor:pointer;
+}
+button:hover{background:#245c48}
+.cards{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+ gap:20px;
+}
+.card{
+ background:white;
+ padding:20px;
+ border-radius:12px;
+ box-shadow:0 3px 10px #0001;
+}
+.card h3{color:#347858}
+.row{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ margin:10px 0;
+ font-size:14px;
+}
+.progress{
+ background:#e5e5e5;
+ height:9px;
+ border-radius:10px;
+ overflow:hidden;
+ margin:10px 0;
+}
+.bar{
+ background:#58a477;
+ height:100%;
+ width:0%;
+}
+form{
+ max-width:500px;
+ margin:auto;
+ background:white;
+ padding:25px;
+ border-radius:12px;
+ box-shadow:0 3px 10px #0001;
+}
+label{
+ display:block;
+ margin-top:14px;
+ font-weight:bold;
+}
+input,select{
+ width:100%;
+ padding:11px;
+ margin-top:7px;
+ border:1px solid #ccc;
+ border-radius:6px;
+}
+form button{width:100%;margin-top:20px}
+.hidden{display:none}
+#result{
+ max-width:600px;
+ margin:20px auto;
+}
+.receipt{
+ background:#e4f3e6;
+ padding:20px;
+ border-radius:12px;
+ line-height:1.8;
+}
+.reward{
+ text-align:center;
+ background:white;
+ padding:25px;
+ border-radius:12px;
+ max-width:500px;
+ margin:auto;
+ box-shadow:0 3px 10px #0001;
+}
+.rewardIcon{font-size:50px}
+.history{
+ background:white;
+ padding:15px;
+ border-radius:10px;
+ margin:12px 0;
+}
+footer{
+ background:#245c48;
+ color:white;
+ text-align:center;
+ padding:22px;
+}
+@media(max-width:600px){
+ nav a{margin:5px;font-size:13px}
+ section{padding:25px 5%}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🌱 LittleNeeds</h1>
+<p>Small Donations. Big Dreams.</p>
+</header>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#needs">Community Needs</a>
+<a href="#donate">Donate</a>
+<a href="#rewards">Rewards</a>
+<a href="#history">History</a>
+</nav>
+
+<section id="home">
+<div class="hero">
+<h2>Every Little Thing Makes a Difference 💚</h2>
+<p>
+LittleNeeds connects generous people with children who need
+essential items such as books, school bags and clothes.
+Your small contribution can make a child's day brighter
+and help them build a better future.
+</p>
+<br>
+<button onclick="go('needs')">Explore Community Needs</button>
+</div>
+</section>
+
+<section id="needs">
+<h2>📦 Community Needs</h2>
+<p style="text-align:center">
+Choose an item needed by children and help fulfill their requirements.
+</p>
+
+<div class="cards">
+
+<div class="card">
+<h3>📚 Books</h3>
+<h2 id="booksTotal">50</h2>
+<p>Books remaining</p>
+<div class="progress"><div class="bar" id="booksBar"></div></div>
+<p id="booksProgress"></p>
+<div id="booksDetails"></div>
+<button onclick="selectItem('Books')">Donate Books</button>
+</div>
+
+<div class="card">
+<h3>🎒 School Bags</h3>
+<h2 id="bagsTotal">30</h2>
+<p>School bags remaining</p>
+<div class="progress"><div class="bar" id="bagsBar"></div></div>
+<p id="bagsProgress"></p>
+<div id="bagsDetails"></div>
+<button onclick="selectItem('School Bags')">Donate Bags</button>
+</div>
+
+<div class="card">
+<h3>👕 Clothes</h3>
+<h2 id="clothesTotal">40</h2>
+<p>Clothes remaining</p>
+<div class="progress"><div class="bar" id="clothesBar"></div></div>
+<p id="clothesProgress"></p>
+<div id="clothesDetails"></div>
+<button onclick="selectItem('Clothes')">Donate Clothes</button>
+</div>
+
+</div>
+</section>
+
+<section id="donate">
+<h2>💝 Make a Donation</h2>
+
+<form id="form">
+<label>Donor Name</label>
+<input id="donor" placeholder="Enter your name" required>
+
+<label>Choose Item</label>
+<select id="item" onchange="loadTypes()" required>
+<option value="">Select an item</option>
+<option>Books</option>
+<option>School Bags</option>
+<option>Clothes</option>
+</select>
+
+<label id="typeLabel" class="hidden">Category / Type</label>
+<select id="type" class="hidden" onchange="loadSizes()"></select>
+
+<label id="sizeLabel" class="hidden">Size</label>
+<select id="size" class="hidden"></select>
+
+<label>Quantity</label>
+<input id="qty" type="number" min="1" value="1" required>
+
+<button type="submit">Donate Now 💚</button>
+</form>
+
+<div id="result"></div>
+</section>
+
+<section id="rewards">
+<h2>🏆 My Donation Rewards</h2>
+
+<div class="reward">
+<div class="rewardIcon" id="rewardIcon">🌱</div>
+<h3 id="badge">Kindness Starter</h3>
+<p id="desc">Every journey starts with kindness!</p>
+<h2 id="points">0 Points</h2>
+<p>Total donated: <b id="total">0</b> items</p>
+</div>
+</section>
+
+<section id="history">
+<h2>📜 Donation History</h2>
+<div id="historyList"></div>
+</section>
+
+<section id="about">
+<div class="hero">
+<h2>About LittleNeeds</h2>
+<p>
+LittleNeeds is a community-driven donation initiative designed
+to connect essential goods with children in need.
+We believe that unused items can become valuable resources
+for another child. Through sharing, kindness and community
+participation, we can make essential needs accessible to everyone.
+</p>
+</div>
+</section>
+
+<footer>
+<p>🌱 LittleNeeds | Sharing Kindness, Creating Hope</p>
+<p>Every contribution matters.</p>
+</footer>
+
+<script>
+const needs={
+ "Books":{
+  "Tamil Storybooks":15,
+  "English Storybooks":15,
+  "School Textbooks":10,
+  "Notebooks":10
+ },
+ "School Bags":{
+  "Small (Classes 1-5)":10,
+  "Medium (Classes 6-8)":10,
+  "Large (Classes 9-12)":10
+ },
+ "Clothes":{
+  "T-Shirts":{S:2,M:3,L:3,XL:2},
+  "Shirts":{S:2,M:3,L:3,XL:2},
+  "Pants":{S:2,M:3,L:3,XL:2},
+  "Dresses":{S:2,M:3,L:3,XL:2}
+ }
+};
+
+const delivery={
+ "Books":["Village Learning Centre","Kinathukadavu, Coimbatore","10 AM – 4 PM"],
+ "School Bags":["Rural Education Group","Pollachi, Coimbatore","9 AM – 3 PM"],
+ "Clothes":["Community Care Centre","Madukkarai, Coimbatore","10 AM – 5 PM"]
+};
+
+const deadline="30 November 2026";
+
+let history=JSON.parse(localStorage.getItem("LN_history_v3")||"[]");
+
+const item=document.getElementById("item");
+const type=document.getElementById("type");
+const size=document.getElementById("size");
+const typeLabel=document.getElementById("typeLabel");
+const sizeLabel=document.getElementById("sizeLabel");
+
+function donated(i,t,s){
+ return history.filter(d=>
+  d.item===i&&d.type===t&&(!s||d.size===s)
+ ).reduce((sum,d)=>sum+d.qty,0);
+}
+
+function remaining(i,t,s){
+ let target=typeof needs[i][t]==="object"
+ ?needs[i][t][s]
+ :needs[i][t];
+
+ return Math.max(0,target-donated(i,t,s));
+}
+
+function updateCard(total,original,totalId,barId,progressId){
+ document.getElementById(totalId).textContent=total;
+
+ let donatedCount=original-total;
+
+ document.getElementById(barId).style.width=
+ (donatedCount/original*100)+"%";
+
+ document.getElementById(progressId).textContent=
+ donatedCount+" of "+original+" donated";
+}
+
+function renderSimple(i,details,totalId,barId,progressId){
+ let html="",total=0,original=0;
+
+ for(let t in needs[i]){
+  let r=remaining(i,t);
+  total+=r;
+  original+=needs[i][t];
+
+  html+=`<div class="row">
+  <span>${t}</span><span>${r} remaining</span></div>`;
+ }
+
+ document.getElementById(details).innerHTML=html;
+
+ updateCard(total,original,totalId,barId,progressId);
+}
+
+function updateNeeds(){
+ renderSimple("Books","booksDetails","booksTotal","booksBar","booksProgress");
+ renderSimple("School Bags","bagsDetails","bagsTotal","bagsBar","bagsProgress");
+
+ let html="",total=0,original=0;
+
+ for(let t in needs.Clothes){
+  html+=`<b>${t}</b>`;
+
+  for(let s in needs.Clothes[t]){
+   let r=remaining("Clothes",t,s);
+   total+=r;
+   original+=needs.Clothes[t][s];
+
+   html+=`<div class="row">
+   <span>Size ${s}</span>
+   <span>${r} remaining</span></div>`;
+  }
+ }
+
+ document.getElementById("clothesDetails").innerHTML=html;
+
+ updateCard(total,original,"clothesTotal","clothesBar","clothesProgress");
+}
+
+function selectItem(i){
+ item.value=i;
+ loadTypes();
+ go("donate");
+}
+
+function loadTypes(){
+ let i=item.value;
+
+ type.innerHTML="";
+ size.innerHTML="";
+
+ type.classList.add("hidden");
+ size.classList.add("hidden");
+ typeLabel.classList.add("hidden");
+ sizeLabel.classList.add("hidden");
+
+ if(!i)return;
+
+ type.classList.remove("hidden");
+ typeLabel.classList.remove("hidden");
+
+ type.innerHTML='<option value="">Select Category</option>';
+
+ for(let t in needs[i]){
+  type.innerHTML+=`<option value="${t}">${t}</option>`;
+ }
+
+ if(i==="Books")typeLabel.textContent="Select Book Category";
+ if(i==="School Bags")typeLabel.textContent="Select Bag Size";
+
+ if(i==="Clothes"){
+  typeLabel.textContent="Select Clothing Type";
+  size.classList.remove("hidden");
+  sizeLabel.classList.remove("hidden");
+  size.innerHTML='<option value="">Select Clothing Size</option>';
+ }
+}
+
+function loadSizes(){
+ size.innerHTML='<option value="">Select Clothing Size</option>';
+
+ if(item.value==="Clothes"&&type.value){
+  for(let s in needs.Clothes[type.value]){
+   let r=remaining("Clothes",type.value,s);
+
+   size.innerHTML+=`<option value="${s}" ${r===0?"disabled":""}>
+   ${s} (${r} remaining)</option>`;
+  }
+ }
+}
+
+type.addEventListener("change",loadSizes);
+
+function updateRewards(){
+ let total=history.reduce((s,d)=>s+d.qty,0);
+ let points=total*10;
+
+ let icon="🌱",badge="Kindness Starter",
+ desc="Every journey starts with kindness!";
+
+ if(total>=100){
+  icon="🏆";
+  badge="Community Hero";
+  desc="You are an inspiration to the community!";
+ }
+ else if(total>=50){
+  icon="🌟";
+  badge="LittleNeeds Champion";
+  desc="Your kindness is making a big difference!";
+ }
+ else if(total>=20){
+  icon="💚";
+  badge="Caring Contributor";
+  desc="Thank you for caring for children!";
+ }
+
+ document.getElementById("rewardIcon").textContent=icon;
+ document.getElementById("badge").textContent=badge;
+ document.getElementById("desc").textContent=desc;
+ document.getElementById("points").textContent=points+" Points";
+ document.getElementById("total").textContent=total;
+}
+
+function updateHistory(){
+ let html="";
+
+ if(history.length===0){
+  html='<div class="history">No donations yet. Start your kindness journey! 🌱</div>';
+ }
+
+ history.slice().reverse().forEach(d=>{
+  html+=`<div class="history">
+  <b>${safe(d.donor)}</b> donated <b>${d.qty}</b>
+  ${d.item} – ${safe(d.type)}
+  ${d.size?"("+d.size+")":""}
+  <br><small>${d.date}</small>
+  </div>`;
+ });
+
+ document.getElementById("historyList").innerHTML=html;
+}
+
+function safe(text){
+ return String(text).replace(/[&<>"']/g,m=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",
+ '"':"&quot;","'":"&#39;"
+ }[m]));
+}
+
+document.getElementById("form").addEventListener("submit",function(e){
+ e.preventDefault();
+
+ let donor=document.getElementById("donor").value.trim();
+ let i=item.value;
+ let t=type.value;
+ let s=size.value;
+ let q=Number(document.getElementById("qty").value);
+
+ if(!donor||!i||!t||q<1){
+  alert("Please fill all required details.");
+  return;
+ }
+
+ if(i==="Clothes"&&!s){
+  alert("Please select clothing size.");
+  return;
+ }
+
+ let available=remaining(i,t,s);
+
+ if(q>available){
+  alert("Only "+available+" item(s) remaining in this category!");
+  return;
+ }
+
+ if(available===0){
+  alert("This item is already fulfilled!");
+  return;
+ }
+
+ let date=new Date().toLocaleString();
+
+ history.push({
+  donor:donor,
+  item:i,
+  type:t,
+  size:s,
+  qty:q,
+  date:date
+ });
+
+ localStorage.setItem("LN_history_v3",JSON.stringify(history));
+
+ updateNeeds();
+ updateRewards();
+ updateHistory();
+
+ let d=delivery[i];
+
+ document.getElementById("result").innerHTML=
+ `<div class="receipt">
+ <h2>🎉 Donation Successful!</h2>
+ <p>Thank you, <b>${safe(donor)}</b>, for your kindness!</p>
+ <p>📦 Donated: <b>${q} ${safe(i)}</b></p>
+ <p>Category: <b>${safe(t)}</b></p>
+ ${s?`<p>Size: <b>${safe(s)}</b></p>`:""}
+ <p>🌟 Points earned: <b>${q*10}</b></p>
+ <p>🏅 Your reward: <b>${q>=20?"LittleNeeds Champion":"Kindness Starter"}</b></p>
+ <hr>
+ <h3>📍 Delivery Instructions</h3>
+ <p>Destination: <b>${d[0]}</b></p>
+ <p>Location: <b>${d[1]}</b></p>
+ <p>Drop-off Time: <b>${d[2]}</b></p>
+ <p>Deadline: <b>${deadline}</b></p>
+ <hr>
+ <p>⚠️ These are sample delivery details for the website prototype, not verified donation centres. Donations are simulated and are not actually submitted to any organization.</p>
+ </div>`;
+
+ this.reset();
+ loadTypes();
+});
+
+function go(id){
+ document.getElementById(id).scrollIntoView({behavior:"smooth"});
+}
+
+updateNeeds();
+updateRewards();
+updateHistory();
+</script>
+
+</body>
+</html>
